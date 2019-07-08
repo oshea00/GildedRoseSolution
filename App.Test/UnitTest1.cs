@@ -14,19 +14,28 @@ namespace Tests
         public void Setup()
         { 
             StartingItems = new List<Item>
-              {
-                  new Item {Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20},
-                  new Item {Name = "Aged Brie", SellIn = 2, Quality = 0},
-                  new Item {Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7},
-                  new Item {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80},
-                  new Item
+            {
+                new InventoryItemDecaying {Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20},
+                new InventoryItemImproving {Name = "Aged Brie", SellIn = 2, Quality = 0},
+                new InventoryItemDecaying {Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7},
+                new InventoryItemLegendary {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80},
+                new InventoryItemAgeBasedImproving
                       {
                           Name = "Backstage passes to a TAFKAL80ETC concert",
                           SellIn = 15,
-                          Quality = 20
+                          Quality = 20,
+                          RateFormula = sellin => {
+                              if (sellin <= 5)
+                                  return 3;
+                              if (sellin <= 10)
+                                  return 2;
+                              return 1;
+                          },
+                          ZeroQualityMax = true
                       },
-                  new Item {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6}
-              };
+                new InventoryItemConjured {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6},
+            };
+
         }
 
         [Test]
@@ -40,29 +49,15 @@ namespace Tests
         [Test]
         public void InventoryItemCanOnlyAge()
         {
-            var inv = new InventoryItem(
-            new Item
-            {
-                Name = "Conjured Mana Cake",
-                SellIn = 3,
-                Quality = 6
-            });
-            inv.UpdateQuality();
-            Assert.AreEqual(2, inv.SellIn);
-            Assert.AreEqual(6, inv.Quality);
-        }
-
-        [Test] 
-        public void InventoryItemHasNameOfItem()
-        {
-            var item = new Item
+            var inv = new InventoryItem
             {
                 Name = "Conjured Mana Cake",
                 SellIn = 3,
                 Quality = 6
             };
-            var inv = new InventoryItem(item);
-            Assert.AreEqual(item.Name, inv.Name);
+            inv.UpdateQuality();
+            Assert.AreEqual(2, inv.SellIn);
+            Assert.AreEqual(6, inv.Quality);
         }
 
         [Test]
@@ -70,13 +65,12 @@ namespace Tests
         [TestCase(3, ExpectedResult = 4, Description = "Conjured items are twice normal decay rate")]
         public int ConjuredInventoryItemsDecayTwiceAsQuickly(int sell)
         {
-            var inv = new InventoryItemConjured(
-            new Item
+            var inv = new InventoryItemConjured
             {
                 Name = "Conjured Mana Cake",
                 SellIn = sell,
                 Quality = 6
-            });
+            };
             inv.UpdateQuality();
             Assert.AreEqual(Max(0,sell-1), inv.SellIn);
             return inv.Quality;
@@ -87,13 +81,12 @@ namespace Tests
         [TestCase(3, ExpectedResult = 5, Description = "normal decay rate")]
         public int DecayableItemsDecayTwiceAsFastWhenPastSellDate(int sell)
         {
-            var inv = new InventoryItemDecaying(
-            new Item
+            var inv = new InventoryItemDecaying
             {
                 Name = "Decayable Cake",
                 SellIn = sell,
                 Quality = 6
-            });
+            };
             inv.UpdateQuality();
             Assert.AreEqual(Max(0, sell - 1), inv.SellIn);
             return inv.Quality;
@@ -102,10 +95,10 @@ namespace Tests
         [Test]
         public void LegendaryItemsDontAgeAndDontDecay()
         {
-            var inv = new InventoryItemLegendary(new Item { 
+            var inv = new InventoryItemLegendary{ 
                 Name = "Sulfuras, Hand of Ragnaros", 
                 SellIn = 0, 
-                Quality = 80 });
+                Quality = 80 };
             inv.UpdateQuality();
             Assert.AreEqual(0, inv.SellIn);
             Assert.AreEqual(80, inv.Quality);
@@ -115,12 +108,12 @@ namespace Tests
         [Test]
         public void ImprovableItemsCantExceedMAXQUALITY()
         {
-            var inv = new InventoryItemImproving(new Item
+            var inv = new InventoryItemImproving
             {
                 Name = "Aged Brie",
                 SellIn = 2,
                 Quality = InventoryItemDecaying.MAX_QUALITY
-            });
+            };
             inv.UpdateQuality();
             Assert.AreEqual(1, inv.SellIn);
             Assert.AreEqual(InventoryItemDecaying.MAX_QUALITY,inv.Quality);
@@ -129,10 +122,10 @@ namespace Tests
         [Test] 
         public void SomeItemsCanImproveWithAge()
         {
-            var inv = new InventoryItemImproving(new Item { 
+            var inv = new InventoryItemImproving { 
                 Name = "Aged Brie", 
                 SellIn = 2, 
-                Quality = 0 });
+                Quality = 0 };
             inv.UpdateQuality();
             Assert.AreEqual(1, inv.Quality);
         }
@@ -145,20 +138,22 @@ namespace Tests
         [TestCase(11, 10, true, ExpectedResult = 11, Description = "quality rate 1 sellin > 10")]
         public int SomeItemsImproveBasedOnAge(int sell, int quality, bool zeroOnMax)
         {
-            var inv = new InventoryItemAgeBasedImproving(
-                new Item
+            var inv = new InventoryItemAgeBasedImproving
+            {
+                Name = "Backstage passes to a TAFKAL80ETC concert",
+                SellIn = sell,
+                Quality = quality,
+                RateFormula = (sellin) =>
                 {
-                    Name = "Backstage passes to a TAFKAL80ETC concert",
-                    SellIn = sell,
-                    Quality = quality
-                }, (sellin) => {
                     if (sellin <= 5)
                         return 3;
                     if (sellin <= 10)
                         return 2;
                     return 1;
-                },zeroOnMax
-            );
+
+                },
+                ZeroQualityMax = zeroOnMax,
+            };
             inv.UpdateQuality();
             Assert.AreEqual(Max(0,sell - 1), inv.SellIn);
             return inv.Quality;
