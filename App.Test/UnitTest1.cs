@@ -20,19 +20,19 @@ namespace Tests
                 new InventoryItemDecaying {Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7},
                 new InventoryItemLegendary {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80},
                 new InventoryItemAgeBasedImproving
-                      {
-                          Name = "Backstage passes to a TAFKAL80ETC concert",
-                          SellIn = 15,
-                          Quality = 20,
-                          RateFormula = sellin => {
+                      (
+                          "Backstage passes to a TAFKAL80ETC concert",
+                          15,
+                          20,
+                          sellin => {
                               if (sellin <= 5)
                                   return 3;
                               if (sellin <= 10)
                                   return 2;
                               return 1;
                           },
-                          ZeroQualityMax = true
-                      },
+                          true
+                      ),
                 new InventoryItemConjured {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6},
             };
 
@@ -139,11 +139,11 @@ namespace Tests
         public int SomeItemsImproveBasedOnAge(int sell, int quality, bool zeroOnMax)
         {
             var inv = new InventoryItemAgeBasedImproving
-            {
-                Name = "Backstage passes to a TAFKAL80ETC concert",
-                SellIn = sell,
-                Quality = quality,
-                RateFormula = (sellin) =>
+            (
+                "Backstage passes to a TAFKAL80ETC concert",
+                sell,
+                quality,
+                (sellin) =>
                 {
                     if (sellin <= 5)
                         return 3;
@@ -152,8 +152,8 @@ namespace Tests
                     return 1;
 
                 },
-                ZeroQualityMax = zeroOnMax,
-            };
+                zeroOnMax
+            );
             inv.UpdateQuality();
             Assert.AreEqual(Max(0,sell - 1), inv.SellIn);
             return inv.Quality;

@@ -64,8 +64,17 @@ namespace App
 
     public class InventoryItemAgeBasedImproving : InventoryItemImproving
     {
-        public Func<int, int> RateFormula;
-        public bool ZeroQualityMax;
+        Func<int, int> RateFormula;
+        bool ZeroQualityMax;
+
+        public InventoryItemAgeBasedImproving(string name, int sellin, int quality, Func<int,int> rateformula, bool zeromax)
+        {
+            Name = name;
+            SellIn = sellin;
+            Quality = quality;
+            RateFormula = rateformula;
+            ZeroQualityMax = zeromax;
+        }
 
         public override int Rate
         {
