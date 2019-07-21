@@ -13,6 +13,8 @@ namespace App
 
     public class LegendaryQualityStrategy : IQualityStrategy
     {
+        static readonly LegendaryQualityStrategy _instance = new LegendaryQualityStrategy();
+        public static LegendaryQualityStrategy Instance => _instance;
         public int UpdateQuality(InventoryItem inv)
         {
             return inv.Quality;
@@ -21,6 +23,8 @@ namespace App
 
     public class ImprovingQualityStrategy : IQualityStrategy
     {
+        static readonly ImprovingQualityStrategy _instance = new ImprovingQualityStrategy();
+        public static ImprovingQualityStrategy Instance => _instance;
         public int UpdateQuality(InventoryItem inv)
         {
             if (inv.Quality > InventoryItem.MAX_QUALITY)
@@ -31,6 +35,8 @@ namespace App
 
     public class DegradingQualityStrategy : IQualityStrategy
     {
+        static readonly DegradingQualityStrategy _instance = new DegradingQualityStrategy();
+        public static DegradingQualityStrategy Instance => _instance;
         public int UpdateQuality(InventoryItem inv)
         {
             if(inv.SellIn == 0)
@@ -46,6 +52,8 @@ namespace App
 
     public class ConjuredQualityStrategy : IQualityStrategy
     {
+        static readonly ConjuredQualityStrategy _instance = new ConjuredQualityStrategy();
+        public static ConjuredQualityStrategy Instance => _instance;
         public int UpdateQuality(InventoryItem inv)
         {
             if (inv.SellIn == 0)
@@ -61,6 +69,8 @@ namespace App
 
     public class BackstagePassQualityStrategy : IQualityStrategy
     {
+        static readonly BackstagePassQualityStrategy _instance = new BackstagePassQualityStrategy();
+        public static BackstagePassQualityStrategy Instance => _instance;
         public int UpdateQuality(InventoryItem inv)
         {
             if (inv.SellIn == 0)
@@ -83,7 +93,7 @@ namespace App
 
         public InventoryItem()
         {
-            QualityStrategy = new LegendaryQualityStrategy();
+            QualityStrategy = LegendaryQualityStrategy.Instance;
         }
 
         void AgeItem()

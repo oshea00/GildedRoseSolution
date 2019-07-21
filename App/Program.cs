@@ -17,27 +17,25 @@ namespace App
                 Items = new List<Item>
                 {
                     new InventoryItem {Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20,
-                        QualityStrategy = new DegradingQualityStrategy()},
+                        QualityStrategy = DegradingQualityStrategy.Instance},
                     new InventoryItem {Name = "Aged Brie", SellIn = 2, Quality = 0,
-                        QualityStrategy = new ImprovingQualityStrategy()},
+                        QualityStrategy = ImprovingQualityStrategy.Instance},
                     new InventoryItem {Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7,
-                        QualityStrategy = new DegradingQualityStrategy()},
+                        QualityStrategy = DegradingQualityStrategy.Instance},
                     new InventoryItem {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80 },
                     new InventoryItem
                     {
                         Name = "Backstage passes to a TAFKAL80ETC concert",
                         SellIn = 15,
                         Quality = 20,
-                        QualityStrategy = new BackstagePassQualityStrategy()
+                        QualityStrategy = BackstagePassQualityStrategy.Instance
                     },
                     new InventoryItem {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6,
-                        QualityStrategy = new ConjuredQualityStrategy()},
+                        QualityStrategy = ConjuredQualityStrategy.Instance},
                     }
             };        
 
             app.UpdateQuality();
-
-            System.Console.Read();
 
         }
 

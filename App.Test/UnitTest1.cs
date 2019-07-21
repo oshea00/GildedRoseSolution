@@ -16,21 +16,21 @@ namespace Tests
             StartingItems = new List<Item>
             {
                 new InventoryItem {Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20,
-                    QualityStrategy = new DegradingQualityStrategy()},
+                    QualityStrategy = DegradingQualityStrategy.Instance},
                 new InventoryItem {Name = "Aged Brie", SellIn = 2, Quality = 0,
-                    QualityStrategy = new ImprovingQualityStrategy()},
+                    QualityStrategy = ImprovingQualityStrategy.Instance},
                 new InventoryItem {Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7,
-                    QualityStrategy = new DegradingQualityStrategy()},
+                    QualityStrategy = DegradingQualityStrategy.Instance},
                 new InventoryItem {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80 },
                 new InventoryItem
                 {
                     Name = "Backstage passes to a TAFKAL80ETC concert",
                     SellIn = 15,
                     Quality = 20,
-                    QualityStrategy = new BackstagePassQualityStrategy()
+                    QualityStrategy = BackstagePassQualityStrategy.Instance
                 },
                 new InventoryItem {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6,
-                    QualityStrategy = new ConjuredQualityStrategy()},
+                    QualityStrategy = ConjuredQualityStrategy.Instance},
             };
 
         }
@@ -67,7 +67,7 @@ namespace Tests
                 Name = "Conjured Mana Cake",
                 SellIn = sell,
                 Quality = 6,
-                QualityStrategy = new ConjuredQualityStrategy()
+                QualityStrategy = ConjuredQualityStrategy.Instance
             };
             inv.Update();
             Assert.AreEqual(Max(0,sell-1), inv.SellIn);
@@ -84,7 +84,7 @@ namespace Tests
                 Name = "Decayable Cake",
                 SellIn = sell,
                 Quality = 6,
-                QualityStrategy = new DegradingQualityStrategy()
+                QualityStrategy = DegradingQualityStrategy.Instance
             };
             inv.Update();
             Assert.AreEqual(Max(0, sell - 1), inv.SellIn);
@@ -98,7 +98,7 @@ namespace Tests
                 Name = "Sulfuras, Hand of Ragnaros", 
                 SellIn = 0, 
                 Quality = 80,
-                QualityStrategy = new LegendaryQualityStrategy()
+                QualityStrategy = LegendaryQualityStrategy.Instance
                  
             };
             inv.Update();
@@ -115,7 +115,7 @@ namespace Tests
                 Name = "Aged Brie",
                 SellIn = 2,
                 Quality = InventoryItem.MAX_QUALITY,
-                QualityStrategy = new ImprovingQualityStrategy()
+                QualityStrategy = ImprovingQualityStrategy.Instance
             };
             inv.Update();
             Assert.AreEqual(1, inv.SellIn);
@@ -129,7 +129,7 @@ namespace Tests
                 Name = "Aged Brie",
                 SellIn = 2,
                 Quality = 0,
-                QualityStrategy = new ImprovingQualityStrategy()
+                QualityStrategy = ImprovingQualityStrategy.Instance
             };
             inv.Update();
             Assert.AreEqual(1, inv.Quality);
@@ -147,7 +147,7 @@ namespace Tests
                 Name = "Backstage passes to a TAFKAL80ETC concert",
                 SellIn = sell,
                 Quality = quality,
-                QualityStrategy = new BackstagePassQualityStrategy()
+                QualityStrategy = BackstagePassQualityStrategy.Instance
             };
             inv.Update();
             Assert.AreEqual(Max(0,sell - 1), inv.SellIn);
@@ -157,7 +157,7 @@ namespace Tests
         [Test]
         public void QualityReducesNormally()
         {
-            IQualityStrategy legendaryStrategy = new LegendaryQualityStrategy();
+            IQualityStrategy legendaryStrategy = LegendaryQualityStrategy.Instance;
             var inv = new InventoryItem { SellIn = 0, Quality = 5 };
             Assert.AreEqual(5, legendaryStrategy.UpdateQuality(inv));
         }
@@ -167,7 +167,7 @@ namespace Tests
         [TestCase(0, 5, ExpectedResult = 6)]
         public int QualityCanImprove(int sellIn, int quality)
         {
-            IQualityStrategy improveQualityStrategy = new ImprovingQualityStrategy();
+            IQualityStrategy improveQualityStrategy = ImprovingQualityStrategy.Instance;
             var inv = new InventoryItem { SellIn = sellIn, Quality = quality };
             return improveQualityStrategy.UpdateQuality(inv);
         }
@@ -179,7 +179,7 @@ namespace Tests
         [TestCase(1, 0, ExpectedResult = 0)]
         public int QualityDegrades(int sellIn, int quality)
         {
-            IQualityStrategy degradingQualityStrategy = new DegradingQualityStrategy();
+            IQualityStrategy degradingQualityStrategy = DegradingQualityStrategy.Instance;
             var inv = new InventoryItem { SellIn = sellIn, Quality = quality };
             return degradingQualityStrategy.UpdateQuality(inv);
         }
@@ -191,7 +191,7 @@ namespace Tests
         [TestCase(1, 0, ExpectedResult = 0)]
         public int ConjuredQualityDegradesFaster(int sellIn, int quality)
         {
-            IQualityStrategy conjuredQualityStrategy = new ConjuredQualityStrategy();
+            IQualityStrategy conjuredQualityStrategy = ConjuredQualityStrategy.Instance;
             var inv = new InventoryItem { SellIn = sellIn, Quality = quality };
             return conjuredQualityStrategy.UpdateQuality(inv);
         }
@@ -203,7 +203,7 @@ namespace Tests
         [TestCase(11, 10, ExpectedResult = 11)]
         public int BackstagePassesCanImproveFaster(int sellIn, int quality)
         {
-            IQualityStrategy backstageQualityStrategy = new BackstagePassQualityStrategy();
+            IQualityStrategy backstageQualityStrategy = BackstagePassQualityStrategy.Instance;
             var inv = new InventoryItem { SellIn = sellIn, Quality = quality };
             return backstageQualityStrategy.UpdateQuality(inv);
         }
