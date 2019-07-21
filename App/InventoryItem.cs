@@ -6,6 +6,12 @@ namespace App
         void UpdateQuality();
     }
 
+    public interface IRateable
+    {
+        int Rate { get; }
+        void ApplyRate();
+    }
+
     public class InventoryItem:  Item, IInventoryItem
     {
         protected void AgeItem()
