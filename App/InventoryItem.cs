@@ -3,104 +3,99 @@ namespace App
 {
     public interface IInventoryItem
     {
-        void UpdateQuality();
+        void Update();
     }
 
-    public interface IRateable
+    public interface IQualityStrategy
     {
-        int Rate { get; }
-        void ApplyRate();
+        int UpdateQuality(int currentAge, int currentQuality, int maxQuality);
+    }
+
+    public class LegendaryQualityStrategy : IQualityStrategy
+    {
+        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        {
+            return currentQuality;
+        }
+    }
+
+    public class ImprovingQualityStrategy : IQualityStrategy
+    {
+        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        {
+            if (currentQuality > maxQuality)
+                return currentQuality;
+            return ((currentQuality + 1) > maxQuality ? currentQuality : currentQuality+1);
+        }
+    }
+
+    public class DegradingQualityStrategy : IQualityStrategy
+    {
+        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        {
+            if(currentAge == 0)
+            {
+                return ((currentQuality - 2) < 0 ? 0 : currentQuality - 2);
+            }
+            else
+            {
+                return ((currentQuality - 1) < 0 ? 0 : currentQuality - 1);
+            }
+        }
+    }
+
+    public class ConjuredQualityStrategy : IQualityStrategy
+    {
+        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        {
+            if (currentAge == 0)
+            {
+                return ((currentQuality - 4) < 0 ? 0 : currentQuality - 4);
+            }
+            else
+            {
+                return ((currentQuality - 2) < 0 ? 0 : currentQuality - 2);
+            }
+        }
+    }
+
+    public class BackstagePassQualityStrategy : IQualityStrategy
+    {
+        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        {
+            if (currentAge == 0)
+                return 0;
+
+            if (currentAge <= 5)
+                return ((currentQuality + 3) > maxQuality ? maxQuality : currentQuality + 3);
+
+            if (currentAge <= 10)
+                return ((currentQuality + 2) > maxQuality ? maxQuality : currentQuality + 2);
+
+            return ((currentQuality + 1) > maxQuality ? maxQuality : currentQuality + 1);
+        }
     }
 
     public class InventoryItem:  Item, IInventoryItem
     {
+        public const int MAX_QUALITY = 50;
+        public IQualityStrategy QualityStrategy { get; set; }
+
+        public InventoryItem()
+        {
+            QualityStrategy = new LegendaryQualityStrategy();
+        }
+
         protected void AgeItem()
         {
-            SellIn -= 1;
-            if (SellIn < 0)
-                SellIn = 0;
+            SellIn = ((SellIn - 1) < 0 ? 0 : SellIn - 1);
         }
 
-        public virtual void UpdateQuality()
+        public virtual void Update()
         {
+            Quality = QualityStrategy.UpdateQuality(SellIn, Quality, MAX_QUALITY);
             AgeItem();
         }
     }
 
-    public class InventoryItemDecaying : InventoryItem, IRateable
-    {
-        public const int MIN_QUALITY = 0;
-        public const int MAX_QUALITY = 50;
-        public virtual int Rate 
-        {
-            get {
-                return (SellIn > 0) ? 1 : 2;
-            }
-        }
-
-        public virtual void ApplyRate()
-        {
-            Quality -= Rate;
-            if (Quality < MIN_QUALITY)
-                Quality = MIN_QUALITY;
-            if (Quality > MAX_QUALITY)
-                Quality = MAX_QUALITY;
-        }
-
-        public override void UpdateQuality()
-        {
-            ApplyRate();
-            AgeItem();
-        }
-    }
-
-    public class InventoryItemImproving : InventoryItemDecaying
-    {
-        public override int Rate => -1;
-    }
-
-    public class InventoryItemConjured : InventoryItemDecaying
-    {
-        public override int Rate => base.Rate * 2;
-    }
-
-    public class InventoryItemLegendary : InventoryItem
-    {
-    }
-
-    public class InventoryItemAgeBasedImproving : InventoryItemImproving
-    {
-        Func<int, int> RateFormula;
-        bool ZeroQualityMax;
-
-        public InventoryItemAgeBasedImproving(string name, int sellin, int quality, Func<int,int> rateformula, bool zeromax)
-        {
-            Name = name;
-            SellIn = sellin;
-            Quality = quality;
-            RateFormula = rateformula;
-            ZeroQualityMax = zeromax;
-        }
-
-        public override int Rate
-        {
-            get
-            {
-                return RateFormula(SellIn) * base.Rate;
-            }
-        }
-
-        public override void UpdateQuality()
-        {
-            if (SellIn == 0)
-            {
-                if (ZeroQualityMax)
-                    Quality = 0;
-            }
-            else
-            {
-                base.UpdateQuality();
-            }
-        }
-    }
 }

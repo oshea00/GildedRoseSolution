@@ -16,26 +16,24 @@ namespace App
             {
                 Items = new List<Item>
                 {
-                    new InventoryItemDecaying {Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20},
-                    new InventoryItemImproving {Name = "Aged Brie", SellIn = 2, Quality = 0},
-                    new InventoryItemDecaying {Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7},
-                    new InventoryItemLegendary {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80},
-                    new InventoryItemAgeBasedImproving
-                          (
-                              "Backstage passes to a TAFKAL80ETC concert",
-                              15,
-                              20,
-                              sellin => {
-                                  if (sellin <= 5)
-                                      return 3;
-                                  if (sellin <= 10)
-                                      return 2;
-                                  return 1;
-                              },
-                              true
-                          ),
-                    new InventoryItemConjured {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6},
-                }
+                    new InventoryItem {Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20,
+                        QualityStrategy = new DegradingQualityStrategy()},
+                    new InventoryItem {Name = "Aged Brie", SellIn = 2, Quality = 0,
+                        QualityStrategy = new ImprovingQualityStrategy()},
+                    new InventoryItem {Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7,
+                        QualityStrategy = new DegradingQualityStrategy()},
+                    new InventoryItem {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80,
+                        QualityStrategy = new LegendaryQualityStrategy()},
+                    new InventoryItem
+                    {
+                        Name = "Backstage passes to a TAFKAL80ETC concert",
+                        SellIn = 15,
+                        Quality = 20,
+                        QualityStrategy = new BackstagePassQualityStrategy()
+                    },
+                    new InventoryItem {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6,
+                        QualityStrategy = new ConjuredQualityStrategy()},
+                    }
             };        
 
             app.UpdateQuality();
@@ -57,7 +55,7 @@ namespace App
             foreach (var item in Items)
             {
                 var inv = item as InventoryItem;
-                inv.UpdateQuality();
+                inv.Update();
             }
 
         }
