@@ -159,45 +159,54 @@ namespace Tests
         public void QualityReducesNormally()
         {
             IQualityStrategy legendaryStrategy = new LegendaryQualityStrategy();
-            Assert.AreEqual(5, legendaryStrategy.UpdateQuality(0, 5, 50));
+            var inv = new InventoryItem { SellIn = 0, Quality = 5 };
+            Assert.AreEqual(5, legendaryStrategy.UpdateQuality(inv));
         }
 
         [Test]
-        public void QualityCanImprove()
+        [TestCase(0, 80, ExpectedResult = 80)]
+        [TestCase(0, 5, ExpectedResult = 6)]
+        public int QualityCanImprove(int sellIn, int quality)
         {
             IQualityStrategy improveQualityStrategy = new ImprovingQualityStrategy();
-            Assert.AreEqual(80, improveQualityStrategy.UpdateQuality(0, 80, 50));
-            Assert.AreEqual(6, improveQualityStrategy.UpdateQuality(0, 5, 50));
+            var inv = new InventoryItem { SellIn = sellIn, Quality = quality };
+            return improveQualityStrategy.UpdateQuality(inv);
         }
 
         [Test]
-        public void QualityDegrades()
+        [TestCase(0, 6, ExpectedResult = 4)]
+        [TestCase(0, 1, ExpectedResult = 0)]
+        [TestCase(1, 6, ExpectedResult = 5)]
+        [TestCase(1, 0, ExpectedResult = 0)]
+        public int QualityDegrades(int sellIn, int quality)
         {
             IQualityStrategy degradingQualityStrategy = new DegradingQualityStrategy();
-            Assert.AreEqual(4, degradingQualityStrategy.UpdateQuality(0, 6, 50));
-            Assert.AreEqual(0, degradingQualityStrategy.UpdateQuality(0, 1, 50));
-            Assert.AreEqual(5, degradingQualityStrategy.UpdateQuality(1, 6, 50));
-            Assert.AreEqual(0, degradingQualityStrategy.UpdateQuality(1, 0, 50));
+            var inv = new InventoryItem { SellIn = sellIn, Quality = quality };
+            return degradingQualityStrategy.UpdateQuality(inv);
         }
 
         [Test]
-        public void ConjuredQualityDegradesFaster()
+        [TestCase(0, 6, ExpectedResult = 2)]
+        [TestCase(0, 1, ExpectedResult = 0)]
+        [TestCase(1, 6, ExpectedResult = 4)]
+        [TestCase(1, 0, ExpectedResult = 0)]
+        public int ConjuredQualityDegradesFaster(int sellIn, int quality)
         {
             IQualityStrategy conjuredQualityStrategy = new ConjuredQualityStrategy();
-            Assert.AreEqual(2, conjuredQualityStrategy.UpdateQuality(0, 6, 50));
-            Assert.AreEqual(0, conjuredQualityStrategy.UpdateQuality(0, 1, 50));
-            Assert.AreEqual(4, conjuredQualityStrategy.UpdateQuality(1, 6, 50));
-            Assert.AreEqual(0, conjuredQualityStrategy.UpdateQuality(1, 0, 50));
+            var inv = new InventoryItem { SellIn = sellIn, Quality = quality };
+            return conjuredQualityStrategy.UpdateQuality(inv);
         }
 
         [Test]
-        public void BackstagePassesCanImproveFaster()
+        [TestCase(0, 10, ExpectedResult = 0)]
+        [TestCase(5, 10, ExpectedResult = 13)]
+        [TestCase(10, 10, ExpectedResult = 12)]
+        [TestCase(11, 10, ExpectedResult = 11)]
+        public int BackstagePassesCanImproveFaster(int sellIn, int quality)
         {
             IQualityStrategy backstageQualityStrategy = new BackstagePassQualityStrategy();
-            Assert.AreEqual(0, backstageQualityStrategy.UpdateQuality(0, 10, 50));
-            Assert.AreEqual(13, backstageQualityStrategy.UpdateQuality(5, 10, 50));
-            Assert.AreEqual(12, backstageQualityStrategy.UpdateQuality(10, 10, 50));
-            Assert.AreEqual(11, backstageQualityStrategy.UpdateQuality(11, 10, 50));
+            var inv = new InventoryItem { SellIn = sellIn, Quality = quality };
+            return backstageQualityStrategy.UpdateQuality(inv);
         }
 
     }

@@ -8,71 +8,71 @@ namespace App
 
     public interface IQualityStrategy
     {
-        int UpdateQuality(int currentAge, int currentQuality, int maxQuality);
+        int UpdateQuality(InventoryItem inv);
     }
 
     public class LegendaryQualityStrategy : IQualityStrategy
     {
-        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        public int UpdateQuality(InventoryItem inv)
         {
-            return currentQuality;
+            return inv.Quality;
         }
     }
 
     public class ImprovingQualityStrategy : IQualityStrategy
     {
-        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        public int UpdateQuality(InventoryItem inv)
         {
-            if (currentQuality > maxQuality)
-                return currentQuality;
-            return ((currentQuality + 1) > maxQuality ? currentQuality : currentQuality+1);
+            if (inv.Quality > InventoryItem.MAX_QUALITY)
+                return inv.Quality;
+            return ((inv.Quality + 1) > InventoryItem.MAX_QUALITY ? inv.Quality : inv.Quality+1);
         }
     }
 
     public class DegradingQualityStrategy : IQualityStrategy
     {
-        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        public int UpdateQuality(InventoryItem inv)
         {
-            if(currentAge == 0)
+            if(inv.SellIn == 0)
             {
-                return ((currentQuality - 2) < 0 ? 0 : currentQuality - 2);
+                return ((inv.Quality - 2) < 0 ? 0 : inv.Quality - 2);
             }
             else
             {
-                return ((currentQuality - 1) < 0 ? 0 : currentQuality - 1);
+                return ((inv.Quality - 1) < 0 ? 0 : inv.Quality - 1);
             }
         }
     }
 
     public class ConjuredQualityStrategy : IQualityStrategy
     {
-        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        public int UpdateQuality(InventoryItem inv)
         {
-            if (currentAge == 0)
+            if (inv.SellIn == 0)
             {
-                return ((currentQuality - 4) < 0 ? 0 : currentQuality - 4);
+                return ((inv.Quality - 4) < 0 ? 0 : inv.Quality - 4);
             }
             else
             {
-                return ((currentQuality - 2) < 0 ? 0 : currentQuality - 2);
+                return ((inv.Quality - 2) < 0 ? 0 : inv.Quality - 2);
             }
         }
     }
 
     public class BackstagePassQualityStrategy : IQualityStrategy
     {
-        public int UpdateQuality(int currentAge, int currentQuality, int maxQuality)
+        public int UpdateQuality(InventoryItem inv)
         {
-            if (currentAge == 0)
+            if (inv.SellIn == 0)
                 return 0;
 
-            if (currentAge <= 5)
-                return ((currentQuality + 3) > maxQuality ? maxQuality : currentQuality + 3);
+            if (inv.SellIn <= 5)
+                return ((inv.Quality + 3) > InventoryItem.MAX_QUALITY ? InventoryItem.MAX_QUALITY : inv.Quality + 3);
 
-            if (currentAge <= 10)
-                return ((currentQuality + 2) > maxQuality ? maxQuality : currentQuality + 2);
+            if (inv.SellIn <= 10)
+                return ((inv.Quality + 2) > InventoryItem.MAX_QUALITY ? InventoryItem.MAX_QUALITY : inv.Quality + 2);
 
-            return ((currentQuality + 1) > maxQuality ? maxQuality : currentQuality + 1);
+            return ((inv.Quality + 1) > InventoryItem.MAX_QUALITY ? InventoryItem.MAX_QUALITY : inv.Quality + 1);
         }
     }
 
@@ -93,7 +93,7 @@ namespace App
 
         public virtual void Update()
         {
-            Quality = QualityStrategy.UpdateQuality(SellIn, Quality, MAX_QUALITY);
+            Quality = QualityStrategy.UpdateQuality(this);
             AgeItem();
         }
     }
