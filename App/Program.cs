@@ -22,8 +22,7 @@ namespace App
                         QualityStrategy = new ImprovingQualityStrategy()},
                     new InventoryItem {Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7,
                         QualityStrategy = new DegradingQualityStrategy()},
-                    new InventoryItem {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80,
-                        QualityStrategy = new LegendaryQualityStrategy()},
+                    new InventoryItem {Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80 },
                     new InventoryItem
                     {
                         Name = "Backstage passes to a TAFKAL80ETC concert",
