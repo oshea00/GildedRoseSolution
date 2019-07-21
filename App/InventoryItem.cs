@@ -86,12 +86,12 @@ namespace App
             QualityStrategy = new LegendaryQualityStrategy();
         }
 
-        protected void AgeItem()
+        void AgeItem()
         {
             SellIn = ((SellIn - 1) < 0 ? 0 : SellIn - 1);
         }
 
-        public virtual void Update()
+        public void Update()
         {
             Quality = QualityStrategy.UpdateQuality(this);
             AgeItem();
